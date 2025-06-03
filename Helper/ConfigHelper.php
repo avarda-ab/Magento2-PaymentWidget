@@ -53,10 +53,16 @@ class ConfigHelper
         $this->localeResolver = $localeResolver;
         $this->storeManager = $storeManager;
 
-        if ($moduleManager->isEnabled('Avarda_Checkout3') && $this->isCheckoutActive()) {
-            $this->parentModule = self::MODE_CHECKOUT;
-        } elseif ($moduleManager->isEnabled('Avarda_Payments') && $this->isPaymentsActive()) {
-            $this->parentModule = self::MODE_PAYMENTS;
+        if ($moduleManager->isEnabled('Avarda_Checkout3') ||
+            $moduleManager->isEnabled('Avarda_Payments')
+        ) {
+            if ($this->isCheckoutActive()) {
+                $this->parentModule = self::MODE_CHECKOUT;
+            } elseif ($this->isPaymentsActive()) {
+                $this->parentModule = self::MODE_PAYMENTS;
+            } else {
+                $this->parentModule = '';
+            }
         } else {
             throw new Exception('You must have either avarda/checkout3 or avarda/payments module installed and enabled');
         }
