@@ -9,18 +9,25 @@ namespace Avarda\PaymentWidget\Observer;
 use Avarda\PaymentWidget\Helper\ConfigHelper;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\FlagManager;
 
 class ConfigSaveObserver implements ObserverInterface
 {
     protected FlagManager $flagManager;
+    protected ConfigHelper $configHelper;
 
     public function __construct(
-        FlagManager $flagManager
+        FlagManager $flagManager,
+        ConfigHelper $configHelper
     ) {
         $this->flagManager = $flagManager;
+        $this->configHelper = $configHelper;
     }
 
+    /**
+     * @throws NoSuchEntityException
+     */
     public function execute(Observer $observer)
     {
         $paths = $observer->getEvent()->getData('changed_paths');
@@ -41,8 +48,16 @@ class ConfigSaveObserver implements ObserverInterface
         }
         // If api keys or api url is changed remove current api token data
         if ($hasChanged) {
-            $this->flagManager->deleteFlag(ConfigHelper::KEY_TOKEN_FLAG);
-            $this->flagManager->deleteFlag(ConfigHelper::KEY_TOKEN_FLAG . '_valid');
+            $store = $observer->getEvent()->getStore();
+
+            // If we changed for a specific store only delete flags for that store. else delete all flags.
+            if ($store) {
+                $this->flagManager->deleteFlag($this->configHelper->getTokenFlagKey());
+                $this->flagManager->deleteFlag($this->configHelper->getTokenValidFlagKey());
+                return;
+            }
+
+            $this->configHelper->deleteAllTokenFlags();
         }
     }
 }

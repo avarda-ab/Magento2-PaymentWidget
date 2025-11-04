@@ -11,6 +11,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Laminas\Http\Request;
 use Magento\Customer\Model\Session;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\FlagManager;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\Http\ClientException;
@@ -159,10 +160,11 @@ class AvardaClient
      * @return string
      * @throws ClientException
      * @throws GuzzleException
+     * @throws NoSuchEntityException
      */
     private function getToken(): string
     {
-        $tokenValid = $this->flagManager->getFlagData(ConfigHelper::KEY_TOKEN_FLAG . '_valid');
+        $tokenValid = $this->flagManager->getFlagData($this->config->getTokenValidFlagKey());
         if (!$tokenValid || $tokenValid < time()) {
 
             $authUrl = $this->config->getTokenUrl();
@@ -182,7 +184,7 @@ class AvardaClient
             } elseif (isset($responseArray['error_description'])) {
                 throw new ClientException(__('Authentication error, check avarda credentials'));
             } else {
-                $this->flagManager->saveFlag(ConfigHelper::KEY_TOKEN_FLAG . '_valid', strtotime($responseArray['tokenExpirationUtc']));
+                $this->flagManager->saveFlag($this->config->getTokenValidFlagKey(), strtotime($responseArray['tokenExpirationUtc']));
                 $this->config->saveNewToken($responseArray['token']);
             }
         }

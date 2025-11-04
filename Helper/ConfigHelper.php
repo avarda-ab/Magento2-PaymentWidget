@@ -5,10 +5,12 @@ namespace Avarda\PaymentWidget\Helper;
 use Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\FlagManager;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\Module\Manager;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class ConfigHelper
 {
@@ -27,6 +29,7 @@ class ConfigHelper
 
     protected string $parentModule = '';
 
+    protected StoreManagerInterface $storeManager;
     protected ScopeConfigInterface $config;
     protected EncryptorInterface $encryptor;
     protected FlagManager $flagManager;
@@ -36,12 +39,14 @@ class ConfigHelper
      * @throws Exception
      */
     public function __construct(
+        StoreManagerInterface $storeManager,
         ScopeConfigInterface $scopeConfig,
         EncryptorInterface $encryptor,
         FlagManager $flagManager,
         Manager $moduleManager,
         Resolver $localeResolver,
     ) {
+        $this->storeManager = $storeManager;
         $this->config = $scopeConfig;
         $this->encryptor = $encryptor;
         $this->flagManager = $flagManager;
@@ -165,19 +170,51 @@ class ConfigHelper
 
     /**
      * @return string
+     * @throws NoSuchEntityException
      */
-    public function getToken()
+    public function getTokenFlagKey(): string
     {
-        return $this->encryptor->decrypt($this->flagManager->getFlagData(self::KEY_TOKEN_FLAG));
+        return self::KEY_TOKEN_FLAG . '_' . $this->storeManager->getStore()->getCode();
+    }
+
+    public function deleteAllTokenFlags(): void
+    {
+        $stores = $this->storeManager->getStores();
+        foreach ($stores as $store) {
+            $this->flagManager->deleteFlag(self::KEY_TOKEN_FLAG . '_' . $store->getCode());
+            $this->flagManager->deleteFlag(self::KEY_TOKEN_FLAG . '_' . $store->getCode() . '_valid');
+        }
+    }
+
+    /**
+     * @return string
+     * @throws NoSuchEntityException
+     */
+    public function getTokenValidFlagKey(): string
+    {
+        return $this->getTokenFlagKey() . '_valid';
+    }
+
+    /**
+     * @throws NoSuchEntityException
+     */
+    public function getToken(): string
+    {
+        $token = $this->flagManager->getFlagData($this->getTokenFlagKey());
+        if (!$token) {
+            return '';
+        }
+        return $this->encryptor->decrypt($token);
     }
 
     /**
      * @param $token string
      * @return bool
+     * @throws NoSuchEntityException
      */
-    public function saveNewToken(string $token)
+    public function saveNewToken(string $token): bool
     {
-        return $this->flagManager->saveFlag(self::KEY_TOKEN_FLAG, $this->encryptor->encrypt($token));
+        return $this->flagManager->saveFlag($this->getTokenFlagKey(), $this->encryptor->encrypt($token));
     }
 
     /**
