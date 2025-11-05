@@ -5,10 +5,12 @@ namespace Avarda\PaymentWidget\Helper;
 use Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\FlagManager;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\Module\Manager;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class ConfigHelper
 {
@@ -31,6 +33,8 @@ class ConfigHelper
     protected EncryptorInterface $encryptor;
     protected FlagManager $flagManager;
     protected Resolver $localeResolver;
+    protected StoreManagerInterface $storeManager;
+    protected $storeId = null;
 
     /**
      * @throws Exception
@@ -41,19 +45,48 @@ class ConfigHelper
         FlagManager $flagManager,
         Manager $moduleManager,
         Resolver $localeResolver,
+        StoreManagerInterface $storeManager,
     ) {
         $this->config = $scopeConfig;
         $this->encryptor = $encryptor;
         $this->flagManager = $flagManager;
         $this->localeResolver = $localeResolver;
+        $this->storeManager = $storeManager;
 
-        if ($moduleManager->isEnabled('Avarda_Checkout3') && $this->isCheckoutActive()) {
-            $this->parentModule = self::MODE_CHECKOUT;
-        } elseif ($moduleManager->isEnabled('Avarda_Payments') && $this->isPaymentsActive()) {
-            $this->parentModule = self::MODE_PAYMENTS;
+        if ($moduleManager->isEnabled('Avarda_Checkout3') ||
+            $moduleManager->isEnabled('Avarda_Payments')
+        ) {
+            if ($this->isCheckoutActive()) {
+                $this->parentModule = self::MODE_CHECKOUT;
+            } elseif ($this->isPaymentsActive()) {
+                $this->parentModule = self::MODE_PAYMENTS;
+            } else {
+                $this->parentModule = '';
+            }
         } else {
             throw new Exception('You must have either avarda/checkout3 or avarda/payments module installed and enabled');
         }
+    }
+
+    /**
+     * Can set which store scope to get configs from
+     * @param $storeId
+     */
+    public function setStoreId($storeId): void
+    {
+        $this->storeId = $storeId;
+    }
+
+    /**
+     * @return int
+     * @throws NoSuchEntityException
+     */
+    public function getStoreId()
+    {
+        if (!$this->storeId) {
+            $this->storeId = $this->storeManager->getStore()->getId();
+        }
+        return $this->storeId;
     }
 
     /**
@@ -91,7 +124,7 @@ class ConfigHelper
      *
      * @return bool
      */
-    public function isActive()
+    public function isActive(): bool
     {
         if ($this->getMode() == self::MODE_CHECKOUT) {
             return (bool) $this->getConfigValue('avarda/payment_widget/checkout_active');
@@ -103,9 +136,9 @@ class ConfigHelper
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function getTestMode()
+    public function getTestMode(): bool
     {
         if ($this->getMode() == self::MODE_CHECKOUT) {
             return (bool) $this->getConfigValue('payment/avarda_checkout3_checkout/test_mode');
@@ -147,7 +180,7 @@ class ConfigHelper
     /**
      * @return string
      */
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         if ($this->getTestMode()) {
             return self::TEST_URL;
@@ -168,16 +201,16 @@ class ConfigHelper
      */
     public function getToken()
     {
-        return $this->encryptor->decrypt($this->flagManager->getFlagData(self::KEY_TOKEN_FLAG));
+        return $this->encryptor->decrypt($this->flagManager->getFlagData(self::KEY_TOKEN_FLAG . $this->getStoreId()));
     }
 
     /**
      * @param $token string
      * @return bool
      */
-    public function saveNewToken(string $token)
+    public function saveNewToken(string $token): bool
     {
-        return $this->flagManager->saveFlag(self::KEY_TOKEN_FLAG, $this->encryptor->encrypt($token));
+        return $this->flagManager->saveFlag(self::KEY_TOKEN_FLAG . $this->getStoreId(), $this->encryptor->encrypt($token));
     }
 
     /**

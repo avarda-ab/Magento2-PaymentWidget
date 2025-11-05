@@ -3,7 +3,8 @@
     <body>
         <referenceBlock name="product.info.main">
             <block class="Avarda\PaymentWidget\Block\Product\View\PaymentWidget" name="product.payment.widget"
-                   template="Avarda_PaymentWidget::product/view/add_widget.phtml" after="product.price.tier" />
+                   template="Avarda_PaymentWidget::product/view/add_widget.phtml" after="product.price.tier"
+                   ifconfig="avarda/payment_widget/checkout_active" />
         </referenceBlock>
     </body>
 </page>

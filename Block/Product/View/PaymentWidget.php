@@ -25,11 +25,12 @@ class PaymentWidget extends Template
         ConfigHelper $configHelper,
         GetPaymentWidget $getPaymentWidget,
     ) {
+        parent::__construct($context);
+
         $this->request = $request;
         $this->productRepository = $productRepository;
         $this->configHelper = $configHelper;
         $this->getPaymentWidget = $getPaymentWidget;
-        parent::__construct($context);
     }
 
     /**
