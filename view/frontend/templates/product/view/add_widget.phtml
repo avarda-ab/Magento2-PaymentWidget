@@ -20,7 +20,8 @@ if (!$block->getProduct() || !$block->showWidget()) {
                 "boughtCampaigns": {
                     "component": "Avarda_PaymentWidget/js/payment-widget",
                     "jwtWidgetUrl": "<?= $block->getWidgetUrl() ?>",
-                    "customStyles": "<?= $escaper->escapeJs($block->getCustomStyles()) ?>"
+                    "customStyles": "<?= $escaper->escapeJs($block->getCustomStyles()) ?>",
+                    "storeCode": "<?= $escaper->escapeJs($block->getStoreCode()) ?>"
                 }
             }
         }
