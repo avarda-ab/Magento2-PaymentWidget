@@ -10,7 +10,7 @@ use Magento\Payment\Gateway\Http\ClientException;
 
 class GetPaymentWidget
 {
-    const FLAG_KEY = 'avarda_payment_widget';
+    const string FLAG_KEY = 'avarda_payment_widget';
 
     protected AvardaClient $avardaClient;
     protected ConfigHelper $configHelper;
@@ -52,8 +52,15 @@ class GetPaymentWidget
         $url = $this->configHelper->getApiUrl() . 'api/paymentwidget/partner/init';
         $headers = $this->avardaClient->buildHeader();
         $response = $this->avardaClient->get($url, $headers);
-        $this->flagManager->saveFlag(self::FLAG_KEY . $this->configHelper->getStoreId(), json_decode($response, true));
         $responseArray = json_decode($response, true);
-        $this->flagManager->saveFlag(self::FLAG_KEY . '_valid' . $this->configHelper->getStoreId(), strtotime($responseArray['expiredUtc']));
+        $this->flagManager->saveFlag($this->getFlag(), $responseArray);
+        $this->flagManager->saveFlag($this->getFlag('valid'), strtotime($responseArray['expiredUtc'] ?? 0));
+    }
+
+    protected function getFlag(string $suffix = ''): string
+    {
+        $storeCode = $this->configHelper->getStoreCode();
+        $base = self::FLAG_KEY . '_' . $storeCode;
+        return $suffix ? $base . '_' . $suffix : $base;
     }
 }

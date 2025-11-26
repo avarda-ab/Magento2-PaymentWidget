@@ -104,4 +104,9 @@ class PaymentWidget extends Template
         $data = $this->getPaymentWidget->execute();
         return $data['widgetJwt'] ?? '';
     }
+
+    public function getStoreCode(): string
+    {
+        return $this->configHelper->getStoreCode();
+    }
 }
