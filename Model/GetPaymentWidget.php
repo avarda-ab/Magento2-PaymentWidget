@@ -30,7 +30,7 @@ class GetPaymentWidget
      */
     public function execute()
     {
-        $jwtValid = $this->flagManager->getFlagData(self::FLAG_KEY . '_valid' . $this->configHelper->getStoreId());
+        $jwtValid = $this->flagManager->getFlagData($this->getFlag('valid'));
         if (!$jwtValid || $jwtValid < time()) {
             try {
                 $this->getNewJwtData();
@@ -39,7 +39,7 @@ class GetPaymentWidget
             }
         }
 
-        return $this->flagManager->getFlagData(self::FLAG_KEY . $this->configHelper->getStoreId()) ?? [];
+        return $this->flagManager->getFlagData($this->getFlag()) ?? [];
     }
 
     /**
