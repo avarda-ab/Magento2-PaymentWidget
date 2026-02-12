@@ -7,27 +7,23 @@ use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Magento\Framework\FlagManager;
 use Magento\Payment\Gateway\Http\ClientException;
-use Magento\Store\Model\StoreManagerInterface;
 
 class GetPaymentWidget
 {
-    const FLAG_KEY = 'avarda_payment_widget';
+    const string FLAG_KEY = 'avarda_payment_widget';
 
     protected AvardaClient $avardaClient;
     protected ConfigHelper $configHelper;
     protected FlagManager $flagManager;
-    protected StoreManagerInterface $storeManager;
 
     public function __construct(
         AvardaClient $avardaClient,
         ConfigHelper $configHelper,
         FlagManager $flagManager,
-        StoreManagerInterface $storeManager,
     ) {
         $this->avardaClient = $avardaClient;
         $this->configHelper = $configHelper;
         $this->flagManager = $flagManager;
-        $this->storeManager = $storeManager;
     }
 
     public function execute()
@@ -61,7 +57,7 @@ class GetPaymentWidget
 
     protected function getFlag(string $suffix = ''): string
     {
-        $storeCode = $this->storeManager->getStore()->getCode();
+        $storeCode = $this->configHelper->getStoreCode();
         $base = self::FLAG_KEY . '_' . $storeCode;
         return $suffix ? $base . '_' . $suffix : $base;
     }

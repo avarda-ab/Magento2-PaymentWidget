@@ -166,7 +166,6 @@ class AvardaClient
     {
         $tokenValid = $this->flagManager->getFlagData($this->config->getTokenValidFlagKey());
         if (!$tokenValid || $tokenValid < time()) {
-
             $authUrl = $this->config->getTokenUrl();
             $authParam = [
                 'clientId'     => $this->config->getClientId(),

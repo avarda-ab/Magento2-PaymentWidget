@@ -14,18 +14,18 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class ConfigHelper
 {
-    const TEST_URL = 'https://stage.checkout-api.avarda.com/';
-    const PROD_URL = 'https://checkout-api.avarda.com/';
-    const STAGE_WIDGET_JS_URL = 'https://payment-widget.stage.avarda.com/cdn/payment-widget.js';
-    const PROD_WIDGET_JS_URL = 'https://payment-widget.avarda.com/cdn/payment-widget.js';
+    const string TEST_URL = 'https://stage.checkout-api.avarda.com/';
+    const string PROD_URL = 'https://checkout-api.avarda.com/';
+    const string STAGE_WIDGET_JS_URL = 'https://payment-widget.stage.avarda.com/cdn/payment-widget.js';
+    const string PROD_WIDGET_JS_URL = 'https://payment-widget.avarda.com/cdn/payment-widget.js';
 
-    const TOKEN_PATH = 'api/partner/tokens';
-    const KEY_TOKEN_FLAG = 'avarda_payment_widget_api_token';
-    const MODE_CHECKOUT = 'checkout';
-    const MODE_PAYMENTS = 'payments';
+    const string TOKEN_PATH = 'api/partner/tokens';
+    const string KEY_TOKEN_FLAG = 'avarda_payment_widget_api_token';
+    const string MODE_CHECKOUT = 'checkout';
+    const string MODE_PAYMENTS = 'payments';
 
-    const PAYMENT_METHOD_LOAN = 'Loan';
-    const PAYMENT_METHOD_DIRECT_INVOICE = 'direct-invoice';
+    const string PAYMENT_METHOD_LOAN = 'Loan';
+    const string PAYMENT_METHOD_DIRECT_INVOICE = 'direct-invoice';
 
     protected string $parentModule = '';
 
@@ -52,10 +52,16 @@ class ConfigHelper
         $this->flagManager = $flagManager;
         $this->localeResolver = $localeResolver;
 
-        if ($moduleManager->isEnabled('Avarda_Checkout3') && $this->isCheckoutActive()) {
-            $this->parentModule = self::MODE_CHECKOUT;
-        } elseif ($moduleManager->isEnabled('Avarda_Payments') && $this->isPaymentsActive()) {
-            $this->parentModule = self::MODE_PAYMENTS;
+        if ($moduleManager->isEnabled('Avarda_Checkout3') ||
+            $moduleManager->isEnabled('Avarda_Payments')
+        ) {
+            if ($this->isCheckoutActive()) {
+                $this->parentModule = self::MODE_CHECKOUT;
+            } elseif ($this->isPaymentsActive()) {
+                $this->parentModule = self::MODE_PAYMENTS;
+            } else {
+                $this->parentModule = '';
+            }
         } else {
             throw new Exception('You must have either avarda/checkout3 or avarda/payments module installed and enabled');
         }
@@ -96,7 +102,7 @@ class ConfigHelper
      *
      * @return bool
      */
-    public function isActive()
+    public function isActive(): bool
     {
         if ($this->getMode() == self::MODE_CHECKOUT) {
             return (bool) $this->getConfigValue('avarda/payment_widget/checkout_active');
@@ -108,9 +114,9 @@ class ConfigHelper
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
-    public function getTestMode()
+    public function getTestMode(): bool
     {
         if ($this->getMode() == self::MODE_CHECKOUT) {
             return (bool) $this->getConfigValue('payment/avarda_checkout3_checkout/test_mode');
@@ -152,7 +158,7 @@ class ConfigHelper
     /**
      * @return string
      */
-    public function getApiUrl()
+    public function getApiUrl(): string
     {
         if ($this->getTestMode()) {
             return self::TEST_URL;
@@ -283,6 +289,15 @@ class ConfigHelper
         } else {
             return '';
         }
+    }
+
+    /**
+     * @return string
+     * @throws NoSuchEntityException
+     */
+    public function getStoreCode(): string
+    {
+        return $this->storeManager->getStore()->getCode();
     }
 
     /**

@@ -19,7 +19,7 @@ class ConfigSaveObserver implements ObserverInterface
 
     public function __construct(
         FlagManager $flagManager,
-        ConfigHelper $configHelper
+        ConfigHelper $configHelper,
     ) {
         $this->flagManager = $flagManager;
         $this->configHelper = $configHelper;
@@ -46,7 +46,7 @@ class ConfigSaveObserver implements ObserverInterface
                 break;
             }
         }
-        // If api keys or api url is changed remove current api token data
+        // If api keys or test mode is changed, remove current api token data
         if ($hasChanged) {
             $store = $observer->getEvent()->getStore();
 

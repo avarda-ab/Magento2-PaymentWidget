@@ -25,11 +25,12 @@ class PaymentWidget extends Template
         ConfigHelper $configHelper,
         GetPaymentWidget $getPaymentWidget,
     ) {
+        parent::__construct($context);
+
         $this->request = $request;
         $this->productRepository = $productRepository;
         $this->configHelper = $configHelper;
         $this->getPaymentWidget = $getPaymentWidget;
-        parent::__construct($context);
     }
 
     /**
@@ -106,6 +107,6 @@ class PaymentWidget extends Template
 
     public function getStoreCode(): string
     {
-        return $this->_storeManager->getStore()->getCode();
+        return $this->configHelper->getStoreCode();
     }
 }
