@@ -26,8 +26,6 @@ class GetPaymentWidget
         $this->flagManager = $flagManager;
     }
 
-    /**
-     */
     public function execute()
     {
         $jwtValid = $this->flagManager->getFlagData($this->getFlag('valid'));
@@ -47,7 +45,7 @@ class GetPaymentWidget
      * @throws GuzzleException
      * @throws ClientException
      */
-    public function getNewJwtData()
+    public function getNewJwtData(): void
     {
         $url = $this->configHelper->getApiUrl() . 'api/paymentwidget/partner/init';
         $headers = $this->avardaClient->buildHeader();

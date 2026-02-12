@@ -19,7 +19,7 @@ class PaymentWidgetJwt implements SectionSourceInterface
         $this->configHelper = $configHelper;
     }
 
-    public function getSectionData()
+    public function getSectionData(): array
     {
         $data = $this->getPaymentWidget->execute();
         $data['expiredUtc'] = strtotime($data['expiredUtc'] ?? 0);

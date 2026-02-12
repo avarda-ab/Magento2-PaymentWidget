@@ -29,29 +29,28 @@ class ConfigHelper
 
     protected string $parentModule = '';
 
+    protected StoreManagerInterface $storeManager;
     protected ScopeConfigInterface $config;
     protected EncryptorInterface $encryptor;
     protected FlagManager $flagManager;
     protected Resolver $localeResolver;
-    protected StoreManagerInterface $storeManager;
-    protected $storeId = null;
 
     /**
      * @throws Exception
      */
     public function __construct(
+        StoreManagerInterface $storeManager,
         ScopeConfigInterface $scopeConfig,
         EncryptorInterface $encryptor,
         FlagManager $flagManager,
         Manager $moduleManager,
         Resolver $localeResolver,
-        StoreManagerInterface $storeManager,
     ) {
+        $this->storeManager = $storeManager;
         $this->config = $scopeConfig;
         $this->encryptor = $encryptor;
         $this->flagManager = $flagManager;
         $this->localeResolver = $localeResolver;
-        $this->storeManager = $storeManager;
 
         if ($moduleManager->isEnabled('Avarda_Checkout3') ||
             $moduleManager->isEnabled('Avarda_Payments')
@@ -66,27 +65,6 @@ class ConfigHelper
         } else {
             throw new Exception('You must have either avarda/checkout3 or avarda/payments module installed and enabled');
         }
-    }
-
-    /**
-     * Can set which store scope to get configs from
-     * @param $storeId
-     */
-    public function setStoreId($storeId): void
-    {
-        $this->storeId = $storeId;
-    }
-
-    /**
-     * @return int
-     * @throws NoSuchEntityException
-     */
-    public function getStoreId()
-    {
-        if (!$this->storeId) {
-            $this->storeId = $this->storeManager->getStore()->getId();
-        }
-        return $this->storeId;
     }
 
     /**
@@ -198,19 +176,51 @@ class ConfigHelper
 
     /**
      * @return string
+     * @throws NoSuchEntityException
      */
-    public function getToken()
+    public function getTokenFlagKey(): string
     {
-        return $this->encryptor->decrypt($this->flagManager->getFlagData(self::KEY_TOKEN_FLAG . $this->getStoreId()));
+        return self::KEY_TOKEN_FLAG . '_' . $this->storeManager->getStore()->getCode();
+    }
+
+    public function deleteAllTokenFlags(): void
+    {
+        $stores = $this->storeManager->getStores();
+        foreach ($stores as $store) {
+            $this->flagManager->deleteFlag(self::KEY_TOKEN_FLAG . '_' . $store->getCode());
+            $this->flagManager->deleteFlag(self::KEY_TOKEN_FLAG . '_' . $store->getCode() . '_valid');
+        }
+    }
+
+    /**
+     * @return string
+     * @throws NoSuchEntityException
+     */
+    public function getTokenValidFlagKey(): string
+    {
+        return $this->getTokenFlagKey() . '_valid';
+    }
+
+    /**
+     * @throws NoSuchEntityException
+     */
+    public function getToken(): string
+    {
+        $token = $this->flagManager->getFlagData($this->getTokenFlagKey());
+        if (!$token) {
+            return '';
+        }
+        return $this->encryptor->decrypt($token);
     }
 
     /**
      * @param $token string
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function saveNewToken(string $token): bool
     {
-        return $this->flagManager->saveFlag(self::KEY_TOKEN_FLAG . $this->getStoreId(), $this->encryptor->encrypt($token));
+        return $this->flagManager->saveFlag($this->getTokenFlagKey(), $this->encryptor->encrypt($token));
     }
 
     /**

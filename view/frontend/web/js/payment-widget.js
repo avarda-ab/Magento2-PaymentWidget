@@ -8,15 +8,17 @@ define([
         jwtWidgetUrl: '',
         customStyles: '',
         widgetJwtData: false,
+        storeCode: '',
         initialize: function () {
             this._super();
             let that = this;
             let sections = ['avarda-payment-widget-jwt'];
             customerData.getInitCustomerData().done(function () {
                 that.widgetJwtData = customerData.get('avarda-payment-widget-jwt');
+
                 let x = that.widgetJwtData();
-                // Check that if widget JWT is not set or if it is expired
-                if ((!x || typeof x === 'object' && !Object.keys(x).length) || (that.widgetJwtData().expiredUtc - Math.floor(Date.now() / 1000)) < 0) {
+                // Check that if widget JWT is not set or if it is expired or we are in a different store
+                if ((!x || typeof x === 'object' && !Object.keys(x).length) || (that.widgetJwtData().expiredUtc - Math.floor(Date.now() / 1000)) < 0 || (that.widgetJwtData().storeCode !== that.storeCode)) {
                     // Refresh widget JWT from server
                     customerData.invalidate(sections);
                     customerData.reload(sections, true).done(function () {
