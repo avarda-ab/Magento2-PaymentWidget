@@ -14,18 +14,18 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class ConfigHelper
 {
-    const string TEST_URL = 'https://stage.checkout-api.avarda.com/';
-    const string PROD_URL = 'https://checkout-api.avarda.com/';
-    const string STAGE_WIDGET_JS_URL = 'https://payment-widget.stage.avarda.com/cdn/payment-widget.js';
-    const string PROD_WIDGET_JS_URL = 'https://payment-widget.avarda.com/cdn/payment-widget.js';
+    const TEST_URL = 'https://stage.checkout-api.avarda.com/';
+    const PROD_URL = 'https://checkout-api.avarda.com/';
+    const STAGE_WIDGET_JS_URL = 'https://payment-widget.stage.avarda.com/cdn/payment-widget.js';
+    const PROD_WIDGET_JS_URL = 'https://payment-widget.avarda.com/cdn/payment-widget.js';
 
-    const string TOKEN_PATH = 'api/partner/tokens';
-    const string KEY_TOKEN_FLAG = 'avarda_payment_widget_api_token';
-    const string MODE_CHECKOUT = 'checkout';
-    const string MODE_PAYMENTS = 'payments';
+    const TOKEN_PATH = 'api/partner/tokens';
+    const KEY_TOKEN_FLAG = 'avarda_payment_widget_api_token';
+    const MODE_CHECKOUT = 'checkout';
+    const MODE_PAYMENTS = 'payments';
 
-    const string PAYMENT_METHOD_LOAN = 'Loan';
-    const string PAYMENT_METHOD_DIRECT_INVOICE = 'direct-invoice';
+    const PAYMENT_METHOD_LOAN = 'Loan';
+    const PAYMENT_METHOD_DIRECT_INVOICE = 'direct-invoice';
 
     protected string $parentModule = '';
 
