@@ -10,7 +10,7 @@ use Magento\Payment\Gateway\Http\ClientException;
 
 class GetPaymentWidget
 {
-    const string FLAG_KEY = 'avarda_payment_widget';
+    const FLAG_KEY = 'avarda_payment_widget';
 
     protected AvardaClient $avardaClient;
     protected ConfigHelper $configHelper;
