@@ -40,7 +40,7 @@
                     <field id="checkout_custom_css" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Custom Css</label>
                         <config_path>avarda/payment_widget/checkout_custom_css</config_path>
-                        <comment><![CDATA[<a target="_blank" rel="noopener" href="https://docs.avarda.com/checkout-3/more-features/custom-css-styles/">See documentation here</a>, add each config as one row for example:
+                        <comment><![CDATA[<a target="_blank" rel="noopener" href="https://docs.avarda.com/checkout-3/custom-css-styles/">See documentation here</a>, add each config as one row for example:
                         <pre class="code-example">buttons.primary.base.backgroundColor='#fff'
 buttons.primary.fontSize='15'</pre>]]></comment>
                         <depends>
@@ -81,7 +81,7 @@ buttons.primary.fontSize='15'</pre>]]></comment>
                     <field id="invoice_custom_css" translate="label" type="textarea" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Custom Css</label>
                         <config_path>avarda/payment_widget/invoice_custom_css</config_path>
-                        <comment><![CDATA[<a target="_blank" rel="noopener" href="https://docs.avarda.com/checkout-3/more-features/custom-css-styles/">See documentation here</a>, add each config as one row for example:
+                        <comment><![CDATA[<a target="_blank" rel="noopener" href="https://docs.avarda.com/checkout-3/custom-css-styles/">See documentation here</a>, add each config as one row for example:
                     <pre class="code-example">buttons.primary.base.backgroundColor='#fff'
 buttons.primary.fontSize='15'</pre>]]></comment>
                         <depends>
