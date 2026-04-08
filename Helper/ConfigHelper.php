@@ -180,7 +180,7 @@ class ConfigHelper
      */
     public function getTokenFlagKey(): string
     {
-        return self::KEY_TOKEN_FLAG . '_' . $this->storeManager->getStore()->getCode();
+        return self::KEY_TOKEN_FLAG . '_' . $this->getStoreCode();
     }
 
     public function deleteAllTokenFlags(): void
