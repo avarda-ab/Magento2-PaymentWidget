@@ -33,6 +33,17 @@ class PaymentWidget extends Template
         $this->getPaymentWidget = $getPaymentWidget;
     }
 
+    public function _toHtml(): string
+    {
+        if (!$this->_scopeConfig->isSetFlag('avarda/payment_widget/checkout_active')
+            && !$this->_scopeConfig->isSetFlag('avarda/payment_widget/invoice_active')
+        ) {
+            return '';
+        }
+
+        return parent::_toHtml();
+    }
+
     /**
      * @return bool
      */
