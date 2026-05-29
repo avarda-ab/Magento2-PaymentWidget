@@ -229,7 +229,7 @@ class ConfigHelper
      */
     protected function getConfigValue($key)
     {
-        return $this->config->getValue($key, ScopeInterface::SCOPE_STORE);
+        return $this->config->getValue($key, ScopeInterface::SCOPE_STORE, $this->getStoreCode());
     }
 
     /**
