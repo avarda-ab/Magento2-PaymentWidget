@@ -1,26 +1,20 @@
 define([
-    'jquery',
-    'mage/utils/wrapper'
-], function ($, wrapper) {
+    'jquery'
+], function ($) {
     'use strict';
 
     return function (widget) {
         $.widget('mage.priceBundle', widget, {
-            updateProductSummary: function () {
+            _create: function () {
+                $(this.options.priceBoxSelector, this.element).on('priceUpdated', function (event, prices) {
+                    const paymentWidget = $('#avarda-payment-widget');
+
+                    if (paymentWidget.length && prices && prices.finalPrice) {
+                        paymentWidget.attr('price', prices.finalPrice.amount);
+                    }
+                });
+
                 this._super();
-                this.setPaymentWidgetPrice();
-            },
-
-            setPaymentWidgetPrice: function () {
-                const priceBox = $('.price-configured_price');
-                let price = priceBox.find('.price').text();
-
-                price = price.replace(/[^0-9\,]/g, '').replace(',', '.');
-
-                const paymentWidget = $('#avarda-payment-widget');
-                if (paymentWidget.length) {
-                    paymentWidget.attr('price', price);
-                }
             }
         });
 
