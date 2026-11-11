@@ -7,6 +7,7 @@ use Avarda\PaymentWidget\Model\GetPaymentWidget;
 use Exception;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Pricing\Price\FinalPrice;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
@@ -83,8 +84,12 @@ class PaymentWidget extends Template
      */
     public function getPaymentMethod(): ?string
     {
-        $price = $this->getProduct()->getPrice();
-        return $this->configHelper->getPaymentMethod($price);
+        return $this->configHelper->getPaymentMethod($this->getPrice());
+    }
+
+    public function getPrice(): float
+    {
+        return (float) $this->getProduct()->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE)->getAmount()->getValue();
     }
 
     /**
