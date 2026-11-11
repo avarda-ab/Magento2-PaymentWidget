@@ -10,6 +10,7 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
+use Magento\Store\Model\ScopeInterface;
 
 class PaymentWidget extends Template
 {
@@ -35,8 +36,8 @@ class PaymentWidget extends Template
 
     public function _toHtml(): string
     {
-        if (!$this->_scopeConfig->isSetFlag('avarda/payment_widget/checkout_active')
-            && !$this->_scopeConfig->isSetFlag('avarda/payment_widget/invoice_active')
+        if (!$this->_scopeConfig->isSetFlag('avarda/payment_widget/checkout_active', ScopeInterface::SCOPE_STORE)
+            && !$this->_scopeConfig->isSetFlag('avarda/payment_widget/invoice_active', ScopeInterface::SCOPE_STORE)
         ) {
             return '';
         }
