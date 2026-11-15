@@ -319,10 +319,10 @@ class ConfigHelper
         $styles = [];
         if ($customCss && count(explode("\n", $customCss)) > 0) {
             foreach (explode("\n", $customCss) as $row) {
-                if (!trim($row) && strpos($row, '=') === false) {
+                if (strpos($row, '=') === false) {
                     continue;
                 }
-                [$path, $value] = explode('=', $row);
+                [$path, $value] = explode('=', $row, 2);
                 $value = trim($value, " \t\n\r\0\x0B;'" . '"');
 
                 if (!$value || !$path) {
