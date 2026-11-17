@@ -256,6 +256,7 @@ class ConfigHelper
      */
     public function getPaymentMethod($price)
     {
+        $threshold = null;
         if ($this->getMode() == self::MODE_CHECKOUT) {
             $threshold = $this->getConfigValue('avarda/payment_widget/checkout_widget_threshold');
         } elseif ($this->getMode() == self::MODE_PAYMENTS) {
